@@ -1,0 +1,66 @@
+.ew-languages {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  direction: ltr;
+  flex-shrink: 0;
+  padding: 3px;
+  border: 1px solid #e3ebe5;
+  border-radius: 12px;
+  background: #f5f8f5;
+}
+.ew-languages button {
+  display: grid;
+  place-items: center;
+  min-width: 34px;
+  height: 34px;
+  padding: 0 6px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #6a7c70;
+  font:
+    600 11px/1 Manrope,
+    Arial,
+    sans-serif;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    color 0.15s;
+}
+.ew-languages button[lang="ar"] {
+  font-family: var(--ew-arabic-body);
+  font-size: 20px;
+}
+.ew-languages button:hover {
+  background: #eaf1e8;
+  color: var(--ew-forest);
+}
+.ew-languages button[aria-pressed="true"] {
+  background: #fff;
+  color: var(--ew-forest);
+  box-shadow: 0 1px 3px #173b311c, inset 0 0 0 1px #dce7df;
+}
+.ew-languages button:focus-visible {
+  outline: 2px solid var(--ew-forest);
+  outline-offset: 3px;
+}
+@media (max-width: 600px) {
+  .ew-languages {
+    gap: 1px;
+  }
+  .ew-languages button {
+    min-width: 27px;
+    height: 32px;
+    padding: 0 4px;
+    font-size: 9px;
+  }
+  .ew-languages button[lang="ar"] {
+    font-size: 20px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ew-languages button {
+    transition: none;
+  }
+}

@@ -1,6 +1,9 @@
 name: PR validation
 
 on:
+  schedule:
+    - cron: '0 4 * * *'
+  workflow_dispatch:
   pull_request:
     branches: [main]
   push:
@@ -18,7 +21,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set up Node.js
-        uses: actions/setup-node@v7
+        uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm

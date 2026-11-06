@@ -12,31 +12,6 @@
   justify-content: space-between;
   gap: 32px;
 }
-.ew-brand {
-  display: flex;
-  align-items: center;
-  font: 800 25px var(--ew-body);
-  letter-spacing: -1.3px;
-  text-decoration: none;
-  white-space: nowrap;
-  color: var(--ew-forest);
-}
-.ew-brand:hover {
-  color: var(--ew-forest);
-}
-.ew-brand > span:not(.ew-brand-mark):not(.ew-brand-dot) {
-  font-weight: 500;
-}
-.ew-brand-mark {
-  font-size: 35px;
-  font-weight: 400;
-  margin-right: 9px;
-  color: #7d977d;
-  letter-spacing: 0;
-}
-.ew-brand-dot {
-  color: var(--ew-gold);
-}
 .ew-nav-links {
   display: flex;
   align-items: center;
@@ -225,13 +200,6 @@
   }
 }
 @media (max-width: 480px) {
-  .ew-brand {
-    font-size: 23px;
-  }
-  .ew-brand-mark {
-    font-size: 29px;
-    margin-right: 6px;
-  }
   .ew-nav {
     gap: 8px;
   }
@@ -271,5 +239,28 @@
     font-weight: 600;
     color: var(--ew-forest);
     padding: 10px 0;
+  }
+}
+.ew-nav-heart--label {
+  width: auto !important;
+  gap: 9px;
+  font-size: 12px !important;
+  font-weight: 600;
+}
+.ew-nav-heart--label svg {
+  font-size: 18px;
+}
+.ew-nav-heart--label > span {
+  white-space: nowrap;
+}
+@media (max-width: 480px) {
+  .ew-nav-heart--label > span {
+    font-size: 10px;
+  }
+  .ew-nav-actions {
+    gap: 12px;
+  }
+  .ew-nav {
+    gap: 12px;
   }
 }

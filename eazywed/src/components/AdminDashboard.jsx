@@ -459,7 +459,7 @@ const AdminDashboard = () => {
       </button>
       <div className={`sidebar ${sidebarActive ? "active" : ""}`}>
         <a href="/" className="sidebar-logo">
-          EazyWed
+          Monasebty
         </a>
         <ul className="sidebar-nav">
           <li>
@@ -1961,7 +1961,7 @@ const AdminDashboard = () => {
                     <h5 className="alert-heading">Vendor Application</h5>
                     <p className="mb-0">
                       This vendor has applied to offer {selectedVendor.category}{" "}
-                      services on the EazyWed platform. Please review all
+                      services on the Monasebty platform. Please review all
                       details and verification documents carefully before making
                       a decision.
                     </p>

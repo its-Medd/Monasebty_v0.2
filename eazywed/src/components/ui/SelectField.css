@@ -1,0 +1,94 @@
+.ew-select-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  min-width: 0;
+  min-height: 38px;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--ew-forest);
+  padding: 3px 0;
+  font: 600 13px/1.5 var(--ew-body);
+  text-align: start;
+  cursor: pointer;
+}
+.ew-select-trigger > span:first-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ew-select-trigger > span:last-child {
+  display: inline-flex;
+  flex-shrink: 0;
+  font-size: 15px;
+}
+.ew-select-trigger:hover {
+  color: #315e48;
+}
+.ew-select-trigger:focus-visible {
+  outline: 2px solid var(--ew-forest);
+  outline-offset: 3px;
+}
+.ew-select-trigger[data-state="open"] > span:last-child {
+  transform: rotate(180deg);
+}
+.ew-select-menu {
+  width: var(--radix-select-trigger-width);
+  max-width: calc(100vw - 24px);
+  max-height: min(320px, var(--radix-select-content-available-height));
+  overflow: hidden;
+  border: 1px solid var(--ew-border);
+  border-radius: 9px;
+  padding: 5px;
+  background: #fff;
+  color: var(--ew-forest);
+  box-shadow: 0 12px 36px #173b3120;
+  z-index: 80;
+}
+.ew-select-option {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 10px 12px;
+  padding-inline-end: 34px;
+  outline: 0;
+  border-radius: 5px;
+  cursor: pointer;
+  user-select: none;
+  font: 500 13px/1.6 var(--ew-body);
+}
+.ew-select-option[data-state="checked"] {
+  background: #f1f6f0;
+  font-weight: 700;
+}
+.ew-select-option[data-highlighted] {
+  background: #e4eee4;
+  box-shadow: inset 0 0 0 1px #cad9ca;
+}
+.ew-select-check {
+  position: absolute;
+  inset-inline-end: 11px;
+  display: flex;
+  align-items: center;
+  font-size: 15px;
+}
+.ew-select-scroll {
+  display: grid;
+  place-items: center;
+  height: 26px;
+  color: var(--ew-muted);
+}
+@media (max-width: 600px) {
+  .ew-select-trigger {
+    font-size: 14px;
+    min-height: 40px;
+  }
+  .ew-select-option {
+    font-size: 14px;
+    min-height: 48px;
+  }
+}

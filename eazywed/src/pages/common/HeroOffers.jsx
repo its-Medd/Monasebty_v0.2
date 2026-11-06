@@ -1,53 +1,31 @@
-import { useEffect, useState } from "react";
+import { createElement, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   FiArrowLeft,
   FiArrowRight,
   FiPause,
   FiPlay,
-  FiArrowUpRight,
+  FiCamera,
+  FiCoffee,
+  FiHome,
 } from "react-icons/fi";
+import { findVendor } from "../../data/laayoune";
+import { useLocale } from "../../i18n/useLocale";
 import "./HeroOffers.css";
-const slides = [
-  {
-    id: "laayoune-taj-el-aarouss",
-    category: "Wedding venue enquiry",
-    heading: "A place for your next chapter.",
-    business: "Salle Taj El Aarouss",
-    copy: "Explore a Laayoune business publicly listed for wedding and celebration organisation.",
-    image: "/images/moroccan-wedding.jpg",
-    source:
-      "https://www.la-perle-events.com/en/portfolio/a-timeless-multicultural-wedding-at-palais-namaskar-marrakech",
-    credit: "Marrakech wedding · La Perle Events",
-    position: "50% 22%",
-    path: "/services/Wedding%20Venues/laayoune-taj-el-aarouss",
-  },
-  {
-    id: "laayoune-machawi-dajaj",
-    category: "Catering enquiry",
-    heading: "Bring everyone to the table.",
-    business: "Machawi Dajaj",
-    copy: "Discover publicly listed occasion catering and event services in Laayoune.",
-    image: "/images/marrakech-riad.jpg",
-    source: "https://www.riad-vendome-marrakech.com/en/wedding-marrakech.php",
-    credit: "Riad inspiration · Riad Vendôme, Marrakech",
-    position: "center",
-    path: "/services/Catering/laayoune-machawi-dajaj",
-  },
-  {
-    id: "laayoune-photo-chabab",
-    category: "Photography enquiry",
-    heading: "Keep the moments that matter.",
-    business: "Labo Photo Chabab",
-    copy: "Find local photography contact details. Ask directly about wedding coverage and packages.",
-    image: "/images/moroccan-caftan-wedding.jpg",
-    source: "https://www.roadtobeauty.co.nz/blog/moroccanwedding-marrakech",
-    credit: "Marrakech wedding · Alami Photography / Road to Beauty",
-    position: "50% 30%",
-    path: "/services/Photographers/laayoune-photo-chabab",
-  },
-];
+const items = [
+  "laayoune-taj-el-aarouss",
+  "laayoune-machawi-dajaj",
+  "laayoune-photo-chabab",
+]
+  .map(findVendor)
+  .filter(Boolean);
+const icons = {
+  "Wedding Venues": FiHome,
+  Catering: FiCoffee,
+  Photographers: FiCamera,
+};
 export default function HeroOffers() {
+  const { t, isRtl, formatNumber } = useLocale();
   const [active, setActive] = useState(0);
   const [paused, setPaused] = useState(
     () => window.matchMedia("(prefers-reduced-motion: reduce)").matches,
@@ -55,10 +33,11 @@ export default function HeroOffers() {
   const [hover, setHover] = useState(false);
   const [focused, setFocused] = useState(false);
   const [hidden, setHidden] = useState(document.hidden);
+  const touch = useRef(null);
   useEffect(() => {
-    const onChange = () => setHidden(document.hidden);
-    document.addEventListener("visibilitychange", onChange);
-    return () => document.removeEventListener("visibilitychange", onChange);
+    const change = () => setHidden(document.hidden);
+    document.addEventListener("visibilitychange", change);
+    return () => document.removeEventListener("visibilitychange", change);
   }, []);
   useEffect(() => {
     const media = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -71,115 +50,127 @@ export default function HeroOffers() {
   useEffect(() => {
     if (paused || hover || focused || hidden) return;
     const timer = window.setInterval(
-      () => setActive((i) => (i + 1) % slides.length),
+      () => setActive((i) => (i + 1) % items.length),
       7000,
     );
     return () => window.clearInterval(timer);
   }, [paused, hover, focused, hidden]);
-  const move = (next) => {
+  const move = (index) => {
     setPaused(true);
-    setActive((next + slides.length) % slides.length);
+    setActive((index + items.length) % items.length);
   };
   return (
     <section
-      className="ew-offers"
+      className="ew-ribbon"
       role="region"
       aria-roledescription="carousel"
-      aria-label="Laayoune vendor highlights and quote enquiries"
+      aria-label={t("Local service highlights")}
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
       onFocusCapture={() => setFocused(true)}
-      onBlurCapture={(e) => {
-        if (!e.currentTarget.contains(e.relatedTarget)) setFocused(false);
+      onBlurCapture={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget))
+          setFocused(false);
+      }}
+      onTouchStart={(event) => {
+        touch.current = {
+          x: event.changedTouches[0].clientX,
+          y: event.changedTouches[0].clientY,
+        };
+      }}
+      onTouchEnd={(event) => {
+        if (!touch.current) return;
+        const dx = event.changedTouches[0].clientX - touch.current.x,
+          dy = event.changedTouches[0].clientY - touch.current.y;
+        if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy))
+          move(active + (isRtl ? (dx > 0 ? 1 : -1) : dx < 0 ? 1 : -1));
+        touch.current = null;
       }}
     >
-      <div className="ew-offers-stage" aria-live={paused ? "polite" : "off"}>
-        {slides.map((slide, index) => (
-          <article
-            key={slide.id}
-            aria-hidden={index !== active}
-            className={`ew-offer ${index === active ? "is-active" : ""}`}
-            inert={index !== active ? true : undefined}
+      <div className="ew-shell ew-ribbon-inner">
+        <div
+          className="ew-ribbon-viewport"
+          aria-live={paused ? "polite" : "off"}
+        >
+          <div
+            className="ew-ribbon-track"
+            style={{
+              transform: `translateX(${(isRtl ? 1 : -1) * active * 100}%)`,
+            }}
           >
-            <img
-              src={slide.image}
-              alt=""
-              width="1000"
-              height="900"
-              fetchPriority={index === 0 ? "high" : "auto"}
-              style={{ objectPosition: slide.position }}
-            />
-            <div className="ew-offer-shade" />
-            <div className="ew-offer-content">
-              <span className="ew-offer-kicker">
-                {slide.category} · Laayoune
-              </span>
-              <h2>{slide.heading}</h2>
-              <p>{slide.business}</p>
-              <span className="ew-offer-description">{slide.copy}</span>
-              <Link to={slide.path} className="ew-offer-cta">
-                Explore this service <FiArrowUpRight />
-              </Link>
-              <small>
-                Quote on request · Prices & dates confirmed by the business
-              </small>
-            </div>
-            <a
-              className="ew-offer-credit"
-              href={slide.source}
-              target="_blank"
-              rel="noreferrer"
-            >
-              Illustrative photo: {slide.credit} ↗
-            </a>
-          </article>
-        ))}
-      </div>
-      <div className="ew-offer-controls">
-        <span className="ew-offer-caption">
-          Local services. Your next possibility.
-        </span>
-        <div className="ew-offer-dots">
-          {slides.map((slide, index) => (
-            <button
-              key={slide.id}
-              type="button"
-              aria-label={`Show ${slide.business} banner`}
-              aria-current={index === active ? "true" : undefined}
-              onClick={() => move(index)}
-            >
-              <span />
-            </button>
-          ))}
+            {items.map((vendor, index) => (
+              <article
+                className="ew-ribbon-slide"
+                key={vendor.id}
+                aria-hidden={index !== active}
+                inert={index !== active ? true : undefined}
+              >
+                <span className="ew-ribbon-label">
+                  {createElement(icons[vendor.category], {
+                    "aria-hidden": true,
+                  })}
+                  {t("Local spotlight")}
+                </span>
+                <div className="ew-ribbon-business">
+                  <span>{t(vendor.category)}</span>
+                  <h2>
+                    <bdi>{vendor.title}</bdi>
+                  </h2>
+                </div>
+                <span className="ew-ribbon-quote">{t("Quote on request")}</span>
+                <Link
+                  to={`/services/${encodeURIComponent(vendor.category)}/${vendor.id}`}
+                  className="ew-ribbon-link"
+                >
+                  {t("View details")}
+                  {isRtl ? <FiArrowLeft /> : <FiArrowRight />}
+                </Link>
+              </article>
+            ))}
+          </div>
         </div>
-        <div className="ew-offer-arrows">
+        <div className="ew-ribbon-controls">
+          <div className="ew-ribbon-dots">
+            {items.map((vendor, index) => (
+              <button
+                key={vendor.id}
+                type="button"
+                aria-label={`${t("Show business")}: ${vendor.title}`}
+                aria-current={active === index ? "true" : undefined}
+                onClick={() => move(index)}
+              >
+                <span />
+              </button>
+            ))}
+          </div>
+          <span className="ew-ribbon-count" aria-hidden="true">
+            {formatNumber(active + 1)} / {formatNumber(items.length)}
+          </span>
           <button
             type="button"
-            aria-label="Previous offer banner"
+            aria-label={t("Previous offer banner")}
             onClick={() => move(active - 1)}
           >
-            <FiArrowLeft />
+            {isRtl ? <FiArrowRight /> : <FiArrowLeft />}
           </button>
           <button
             type="button"
-            aria-label={paused ? "Play offer banners" : "Pause offer banners"}
+            aria-label={t(
+              paused ? "Play offer banners" : "Pause offer banners",
+            )}
             onClick={() => setPaused(!paused)}
           >
             {paused ? <FiPlay /> : <FiPause />}
           </button>
           <button
             type="button"
-            aria-label="Next offer banner"
+            aria-label={t("Next offer banner")}
             onClick={() => move(active + 1)}
           >
-            <FiArrowRight />
+            {isRtl ? <FiArrowLeft /> : <FiArrowRight />}
           </button>
         </div>
       </div>
-      <p className="ew-offer-disclaimer">
-        Business highlights, not confirmed discounts. Photos are Moroccan
-        wedding inspiration, not photos of these businesses.
-      </p>
     </section>
   );
 }

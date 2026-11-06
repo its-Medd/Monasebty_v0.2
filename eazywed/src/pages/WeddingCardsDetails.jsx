@@ -59,7 +59,7 @@ const WeddingCardsDetails = () => {
         const data = await fetchCardDetails(id);
         if (!current) return;
         setCard(data);
-        document.title = `${data.name} - Card Details | EazyWed`;
+        document.title = `${data.name} - Card Details | Monasebty`;
       } catch {
         if (!current) return;
         setError("Failed to load card details.");

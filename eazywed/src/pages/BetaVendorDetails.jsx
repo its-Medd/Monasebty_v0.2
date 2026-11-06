@@ -1,4 +1,6 @@
-import { useEffect } from "react";
+import { usePageTitle } from "../i18n/usePageTitle";
+import { useLocale } from "../i18n/useLocale";
+import { useCopyText } from "../hooks/useCopyText";
 import { Link, useParams } from "react-router-dom";
 import { FiMapPin, FiPhone, FiExternalLink, FiHeart } from "react-icons/fi";
 import Navbar from "./common/Navbar";
@@ -8,12 +10,12 @@ import { useShortlist } from "./common/useShortlist";
 import { findVendor } from "../data/laayoune";
 import "./BetaVendorDetails.css";
 export default function BetaVendorDetails() {
+  usePageTitle("Business details");
+  const { t, vendorText } = useLocale();
   const { id } = useParams();
   const vendor = findVendor(id);
   const { isSaved, toggleSaved } = useShortlist();
-  useEffect(() => {
-    document.title = `${vendor?.title || "Listing not found"} | EazyWed Laayoune`;
-  }, [vendor]);
+  const { copy, copied, copyError } = useCopyText();
   return (
     <>
       <Navbar />
@@ -21,78 +23,91 @@ export default function BetaVendorDetails() {
       <main id="main-content" className="ew-shell ew-beta-detail">
         {!vendor ? (
           <div className="ew-empty">
-            <h1 className="ew-page-title">This listing isn't in our beta.</h1>
-            <p>Explore our current Laayoune directory.</p>
+            <h1 className="ew-page-title">
+              {t("This listing isn't in our beta.")}
+            </h1>
+            <p>{t("Explore our current Laayoune directory.")}</p>
             <Link className="ew-button" to="/services">
-              Find local vendors ↗
+              {t("Find local vendors ↗") + " "}
             </Link>
           </div>
         ) : (
           <>
-            <nav aria-label="Breadcrumb">
-              <Link to="/">Home</Link> /{" "}
-              <Link to="/services">Laayoune vendors</Link> / {vendor.title}
+            <nav aria-label={t("Breadcrumb")}>
+              <Link to="/">{t("Home")}</Link> /{" "}
+              <Link to="/services">{t("Laayoune vendors")}</Link> /{" "}
+              <bdi>{vendor.title}</bdi>
             </nav>
             <div className="ew-beta-detail-grid">
               <article>
                 <span className="ew-eyebrow">
-                  {vendor.category} · Laayoune beta
+                  {t(vendor.category)}
+                  {t("· Laayoune beta") + " "}
                 </span>
-                <h1 className="ew-page-title">{vendor.title}</h1>
+                <h1 className="ew-page-title ew-business-title">
+                  <bdi>{vendor.title}</bdi>
+                </h1>
                 <p className="ew-beta-detail-location">
                   <FiMapPin />
-                  {vendor.address ||
-                    "Laayoune · Street address not published in our source"}
+                  {vendorText(vendor, "address") ||
+                    t("Laayoune · Street address not published in our source")}
                 </p>
-                <p className="ew-beta-description">{vendor.description}</p>
+                <p className="ew-beta-description">
+                  {vendorText(vendor, "description")}
+                </p>
                 <section className="ew-beta-facts">
-                  <h2>Know before you enquire.</h2>
-                  <p>{vendor.confirmationNote}</p>
+                  <h2>{t("Know before you enquire.")}</h2>
+                  <p>{vendorText(vendor, "confirmationNote")}</p>
                   <dl>
                     <div>
-                      <dt>Starting price</dt>
-                      <dd>Request a quote</dd>
+                      <dt>{t("Starting price")}</dt>
+                      <dd>{t("Request a quote")}</dd>
                     </div>
                     <div>
-                      <dt>Available dates</dt>
-                      <dd>Confirm directly with the business</dd>
+                      <dt>{t("Available dates")}</dt>
+                      <dd>{t("Confirm directly with the business")}</dd>
                     </div>
                     <div>
-                      <dt>Cancellation policy</dt>
-                      <dd>Not published in our source</dd>
+                      <dt>{t("Cancellation policy")}</dt>
+                      <dd>{t("Not published in our source")}</dd>
                     </div>
                     <div>
-                      <dt>Business photos</dt>
-                      <dd>Not supplied to EazyWed</dd>
+                      <dt>{t("Business photos")}</dt>
+                      <dd>{t("Not supplied to Monasebty")}</dd>
                     </div>
                   </dl>
                 </section>
                 <section className="ew-beta-facts">
-                  <h2>A few helpful questions.</h2>
+                  <h2>{t("A few helpful questions.")}</h2>
                   <ul>
-                    <li>Are you available on our wedding date?</li>
-                    <li>What is included in the total price?</li>
-                    <li>What deposit and cancellation terms apply?</li>
-                    <li>Can we see recent work and confirm the location?</li>
+                    <li>{t("Are you available on our wedding date?")}</li>
+                    <li>{t("What is included in the total price?")}</li>
+                    <li>{t("What deposit and cancellation terms apply?")}</li>
+                    <li>
+                      {t("Can we see recent work and confirm the location?")}
+                    </li>
                   </ul>
                 </section>
               </article>
               <aside className="ew-beta-contact">
-                <span className="ew-eyebrow">Your next step</span>
-                <h2>Start a conversation.</h2>
+                <span className="ew-eyebrow">{t("Your next step")}</span>
+                <h2>{t("Start a conversation.")}</h2>
                 <p>
-                  Bookings and quote requests happen directly with the business
-                  in this beta.
+                  {t(
+                    "Bookings and quote requests happen directly with the business in this beta.",
+                  ) + " "}
                 </p>
                 {vendor.phone ? (
                   <a className="ew-button" href={`tel:${vendor.phone}`}>
                     <FiPhone />
-                    Call {vendor.phone}
+                    {t("Call") + " "}
+                    <bdi dir="ltr">{vendor.phone}</bdi>
                   </a>
                 ) : (
                   <p className="ew-beta-unavailable">
-                    No public phone number was confirmed. Use the source listing
-                    to find current contact information.
+                    {t(
+                      "No public phone number was confirmed. Use the source listing to find current contact information.",
+                    ) + " "}
                   </p>
                 )}
                 <a
@@ -101,7 +116,8 @@ export default function BetaVendorDetails() {
                   target="_blank"
                   rel="noreferrer"
                 >
-                  View public source <FiExternalLink />
+                  {t("View public source") + " "}
+                  <FiExternalLink />
                 </a>
                 <button
                   className="ew-button ew-button--outline"
@@ -110,19 +126,41 @@ export default function BetaVendorDetails() {
                 >
                   <FiHeart />
                   {isSaved(vendor.id)
-                    ? "Saved to your shortlist"
-                    : "Save to your shortlist"}
+                    ? t("Saved to your shortlist")
+                    : t("Save to your shortlist")}
                 </button>
-                <div className="ew-beta-provenance">
-                  <strong>Where this information comes from</strong>
-                  <a href={vendor.sourceUrl} target="_blank" rel="noreferrer">
-                    {vendor.sourceName} ↗
+                {vendor.phone && (
+                  <button
+                    type="button"
+                    className="ew-button ew-button--outline"
+                    onClick={() => copy(vendor.phone)}
+                  >
+                    {copied ? t("Phone copied") : t("Copy phone number")}
+                  </button>
+                )}
+                {vendor.address && (
+                  <a
+                    className="ew-button ew-button--outline"
+                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(vendor.title + " " + vendor.address)}`}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    {t("Find directions ↗")}
                   </a>
-                  <span>Source checked 4 November 2026.</span>
+                )}
+                <span className="ew-copy-status" role="status">
+                  {copied ? t("Copied to clipboard.") : copyError}
+                </span>
+                <div className="ew-beta-provenance">
+                  <strong>{t("Where this information comes from")}</strong>
+                  <a href={vendor.sourceUrl} target="_blank" rel="noreferrer">
+                    {t(vendor.sourceName)} ↗
+                  </a>
+                  <span>{t("Source checked 5 November 2026.")}</span>
                   <p>
-                    Public listing, not a confirmed EazyWed partner. Contact
-                    details and services may change. We haven't contacted the
-                    business or verified availability.
+                    {t(
+                      "Public listing, not a confirmed Monasebty partner. Contact details and services may change. We haven't contacted the business or verified availability.",
+                    ) + " "}
                   </p>
                 </div>
               </aside>

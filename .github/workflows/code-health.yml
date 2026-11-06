@@ -1,0 +1,202 @@
+name: Code health report
+
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows: ["CodeQL"]
+    types:
+      - completed
+
+permissions:
+  contents: read
+  issues: write
+  security-events: read
+
+jobs:
+  sync-codeql-issues:
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
+    steps:
+      - name: Sync CodeQL alerts to GitHub Issues
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+
+            console.log(`Fetching open CodeQL alerts for ${owner}/${repo}...`);
+
+            // 1. Fetch all open CodeQL alerts
+            let alerts = [];
+            try {
+              alerts = await github.paginate(github.rest.codeScanning.listAlertsForRepo, {
+                owner,
+                repo,
+                state: 'open',
+                per_page: 100
+              });
+            } catch (error) {
+              core.setFailed(`Failed to fetch code scanning alerts: ${error.message}`);
+              return;
+            }
+
+            console.log(`Found ${alerts.length} open CodeQL alert(s).`);
+
+            // 2. Group alerts by rule ID
+            const grouped = new Map();
+            for (const alert of alerts) {
+              const ruleId = alert.rule?.id || 'unknown-rule';
+              if (!grouped.has(ruleId)) {
+                grouped.set(ruleId, {
+                  rule: alert.rule,
+                  instances: []
+                });
+              }
+              const inst = alert.most_recent_instance || {};
+              grouped.get(ruleId).instances.push({
+                alertNumber: alert.number,
+                htmlUrl: alert.html_url,
+                path: inst.location?.path || 'unknown',
+                startLine: inst.location?.start_line,
+                endLine: inst.location?.end_line,
+                message: inst.message?.text || 'No message provided'
+              });
+            }
+
+            // 3. Fetch existing open issues managed by this workflow
+            const existingIssues = await github.paginate(github.rest.issues.listForRepo, {
+              owner,
+              repo,
+              state: 'open',
+              labels: 'codeql-alert',
+              per_page: 100
+            });
+
+            // Map existing issues by rule ID
+            const issueByRuleId = new Map();
+            for (const issue of existingIssues) {
+              const match = issue.body && issue.body.match(/<!-- codeql-rule-id: ([\w\/-]+) -->/);
+              if (match) {
+                issueByRuleId.set(match[1], issue);
+              } else {
+                for (const ruleId of grouped.keys()) {
+                  if (issue.title && issue.title.includes(`(${ruleId})`)) {
+                    issueByRuleId.set(ruleId, issue);
+                    break;
+                  }
+                }
+              }
+            }
+
+            const summaryRows = [
+              [{ data: 'Rule ID', header: true }, { data: 'Occurrences', header: true }, { data: 'Files Affected', header: true }, { data: 'Status', header: true }]
+            ];
+
+            // 4. Create or update an issue for each active rule
+            for (const [ruleId, group] of grouped.entries()) {
+              const { rule, instances } = group;
+              const count = instances.length;
+              const files = Array.from(new Set(instances.map(i => i.path)));
+              const filesCount = files.length;
+
+              const title = `[CodeQL] ${rule.description || ruleId} (${ruleId})`;
+
+              // Sort instances by file path, then line number
+              instances.sort((a, b) => {
+                if (a.path !== b.path) return a.path.localeCompare(b.path);
+                return (a.startLine || 0) - (b.startLine || 0);
+              });
+
+              // Build markdown table
+              let tableRows = '';
+              for (let idx = 0; idx < instances.length; idx++) {
+                const inst = instances[idx];
+                const lineStr = inst.startLine ? (inst.endLine && inst.endLine !== inst.startLine ? `L${inst.startLine}-L${inst.endLine}` : `L${inst.startLine}`) : '-';
+                const cleanMsg = (inst.message || '').replace(/\|/g, '\\|').replace(/\r?\n/g, ' ');
+                tableRows += `| ${idx + 1} | \`${inst.path}\` | ${lineStr} | ${cleanMsg} | [Alert #${inst.alertNumber}](${inst.htmlUrl}) |\n`;
+              }
+
+              const tags = (rule.tags || []).join(', ') || 'None';
+              const severity = rule.severity || 'warning';
+              const secSeverity = rule.security_severity_level ? ` | **Security Severity:** \`${rule.security_severity_level}\`` : '';
+
+              let helpSection = '';
+              if (rule.help) {
+                const helpText = rule.help.length > 8000 ? rule.help.slice(0, 8000) + '\n\n*(Truncated for length)*' : rule.help;
+                helpSection = `\n### Remediation & Recommendation\n\n${helpText.trim()}\n`;
+              } else if (rule.full_description) {
+                helpSection = `\n### Remediation\n\n${rule.full_description.trim()}\n`;
+              }
+
+              let body = `## CodeQL Finding: ${rule.description || ruleId}\n\n`;
+              body += `> **Rule ID:** \`${ruleId}\`\n`;
+              body += `> **Severity:** \`${severity}\`${secSeverity}\n`;
+              body += `> **Total Occurrences:** ${count} across ${filesCount} file(s)\n`;
+              body += `> **Tags:** ${tags}\n\n`;
+              body += `### Affected Locations\n\n`;
+              body += `| # | File | Line | Finding | CodeQL Alert |\n`;
+              body += `|---|------|------|---------|--------------|\n`;
+              body += tableRows;
+              body += helpSection;
+              body += `\n---\n`;
+              body += `*Automated issue tracked by CodeQL workflow. Automatically updated or closed as code is fixed.*\n`;
+              body += `<!-- codeql-rule-id: ${ruleId} -->`;
+
+              const labels = ['codeql-alert', 'bug'];
+              if (rule.security_severity_level || (rule.tags && rule.tags.some(t => t.toLowerCase().includes('security')))) {
+                labels.push('security');
+              }
+
+              const existingIssue = issueByRuleId.get(ruleId);
+              if (existingIssue) {
+                console.log(`Updating existing issue #${existingIssue.number} for rule ${ruleId} (${count} occurrences)...`);
+                await github.rest.issues.update({
+                  owner,
+                  repo,
+                  issue_number: existingIssue.number,
+                  title,
+                  body,
+                  labels
+                });
+                summaryRows.push([ruleId, `${count}`, `${filesCount}`, `Updated issue #${existingIssue.number}`]);
+              } else {
+                console.log(`Creating new issue for rule ${ruleId} (${count} occurrences across ${filesCount} files)...`);
+                const newIssue = await github.rest.issues.create({
+                  owner,
+                  repo,
+                  title,
+                  body,
+                  labels
+                });
+                console.log(`Created issue #${newIssue.data.number} for rule ${ruleId}`);
+                summaryRows.push([ruleId, `${count}`, `${filesCount}`, `Created issue #${newIssue.data.number}`]);
+              }
+            }
+
+            // 5. Close issues for rules that no longer have any open alerts
+            for (const [existingRuleId, issue] of issueByRuleId.entries()) {
+              if (!grouped.has(existingRuleId)) {
+                console.log(`All alerts resolved for rule ${existingRuleId}. Closing issue #${issue.number}...`);
+                await github.rest.issues.createComment({
+                  owner,
+                  repo,
+                  issue_number: issue.number,
+                  body: `All CodeQL code-scanning alerts for \`${existingRuleId}\` have been resolved. Closing issue automatically.`
+                });
+                await github.rest.issues.update({
+                  owner,
+                  repo,
+                  issue_number: issue.number,
+                  state: 'closed',
+                  state_reason: 'completed'
+                });
+                summaryRows.push([existingRuleId, '0', '0', `Closed resolved issue #${issue.number}`]);
+              }
+            }
+
+            await core.summary
+              .addHeading('CodeQL Health Report Summary')
+              .addTable(summaryRows)
+              .write();
+
+            console.log('Code health synchronization completed successfully.');

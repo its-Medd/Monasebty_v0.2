@@ -416,7 +416,7 @@ const VendorDashboard = () => {
       </button>
       <div className={`sidebar ${sidebarActive ? "active" : ""}`}>
         <a href="/" className="sidebar-logo">
-          EazyWed
+          Monasebty
         </a>
         <ul className="sidebar-nav">
           <li>

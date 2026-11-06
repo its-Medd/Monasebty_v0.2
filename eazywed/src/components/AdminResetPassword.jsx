@@ -37,10 +37,10 @@ const AdminResetPassword = () => {
     <>
       <div className="main-container">
         <div className="logo-onboarding" style={{ backgroundImage: `url(${onboardingImg})` }}>
-          <h1 className="logo">EazyWed</h1>
+          <h1 className="logo">Monasebty</h1>
         </div>
         <div className="sign-in-form">
-          <h4>Welcome to EazyWed</h4>
+          <h4>Welcome to Monasebty</h4>
           <form id="admin-reset-password-form" onSubmit={handleSubmit}>
             <h5>Reset Password</h5>
             <label htmlFor="new-password">New Password *</label>

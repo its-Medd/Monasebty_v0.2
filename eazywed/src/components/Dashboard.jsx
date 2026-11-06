@@ -420,7 +420,7 @@ const Dashboard = () => {
       </button>
       <div className={`sidebar ${sidebarActive ? "active" : ""}`} id="sidebar">
         <a href="/" className="sidebar-logo">
-          EazyWed
+          Monasebty
         </a>
         <ul className="sidebar-nav">
           <li>

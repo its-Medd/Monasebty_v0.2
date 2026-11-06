@@ -1,5 +1,7 @@
+import { usePageTitle } from "../i18n/usePageTitle";
+import { useLocale } from "../i18n/useLocale";
 import { BETA_MODE } from "../data/laayoune";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { Modal } from "react-bootstrap";
 import { ToastContainer } from "react-toastify";
@@ -13,7 +15,6 @@ import {
 import { useAuth } from "../context/AuthContext";
 import "react-toastify/dist/ReactToastify.css";
 import "./AuthExperience.css";
-
 const phonePattern = /^\+212[67][0-9]{8}$/;
 const normalizePhone = (value) => {
   const compact = value.replace(/[\s()-]/g, "");
@@ -23,6 +24,8 @@ const isDemo = BETA_MODE || import.meta.env.VITE_DEMO_MODE === "true";
 
 // Both customer journeys use one phone-verification experience.
 export function AuthExperience({ createAccount = false }) {
+  usePageTitle("Your account");
+  const { t } = useLocale();
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("+212");
   const [otp, setOtp] = useState("");
@@ -38,11 +41,6 @@ export function AuthExperience({ createAccount = false }) {
   const { signIn, signUp, verifySignInOtp, verifySignUpOtp, loading } =
     useAuth();
   const busy = pending || loading;
-
-  useEffect(() => {
-    document.title = `${createAccount ? "Create your account" : "Sign in"} · EazyWed`;
-  }, [createAccount]);
-
   async function requestCode(event) {
     event.preventDefault();
     if (requestPending.current || isDemo) return;
@@ -83,12 +81,13 @@ export function AuthExperience({ createAccount = false }) {
       setPending(false);
     }
   }
-
   async function verifyCode(event) {
     event.preventDefault();
     if (requestPending.current) return;
     if (!/^\d{6}$/.test(otp)) {
-      setErrors({ otp: "Enter the six-digit code." });
+      setErrors({
+        otp: "Enter the six-digit code.",
+      });
       otpRef.current?.focus();
       return;
     }
@@ -113,66 +112,77 @@ export function AuthExperience({ createAccount = false }) {
       setPending(false);
     }
   }
-
   function closeVerification() {
     if (busy) return;
     setShowOtp(false);
     setErrors({});
     setOtp("");
   }
-
   return (
     <main className="ew-auth-page" id="main-content">
-      <section className="ew-auth-story" aria-label="Your wedding starts here">
-        <Link className="ew-auth-brand" to="/" aria-label="EazyWed home">
-          eazywed<span>✦</span>
+      <section
+        className="ew-auth-story"
+        aria-label={t("Your wedding starts here")}
+      >
+        <Link className="ew-auth-brand" to="/" aria-label={t("Monasebty home")}>
+          monasebty<span>✦</span>
         </Link>
         <div className="ew-auth-story-copy">
           <span className="ew-auth-eyebrow">
-            A little less planning. A lot more joy.
+            {t("A little less planning. A lot more joy.") + " "}
           </span>
           <h1>
-            Your day.
+            {t("Your day.") + " "}
             <br />
-            Your people.
+            {t("Your people.") + " "}
             <br />
-            <em>Your kind of magic.</em>
+            <em>{t("Your kind of magic.")}</em>
           </h1>
           <p>
-            Find the people and details that make your celebration feel like
-            you.
+            {t(
+              "Find the people and details that make your celebration feel like you.",
+            ) + " "}
           </p>
         </div>
         <div className="ew-auth-story-bottom">
-          <span>Made for celebrations in Morocco</span>
+          <span>{t("Made for celebrations in Morocco")}</span>
           <span aria-hidden="true">✦</span>
         </div>
       </section>
       <section className="ew-auth-form-panel" aria-labelledby="auth-heading">
         <Link className="ew-auth-back" to="/">
-          <FiArrowLeft aria-hidden="true" /> Back to exploring
+          <FiArrowLeft aria-hidden="true" />
+          {t("Back to exploring") + " "}
         </Link>
         <div className="ew-auth-form-wrap">
           <span className="ew-auth-kicker">
-            {createAccount ? "Let’s begin" : "A familiar place"}
+            {createAccount ? t("Let’s begin") : t("A familiar place")}
           </span>
           <h2 id="auth-heading">
-            {createAccount ? "Make room for your big day." : "Welcome back."}
+            {createAccount
+              ? t("Make room for your big day.")
+              : t("Welcome back.")}
           </h2>
           <p className="ew-auth-intro">
             {createAccount
-              ? "Create your account with a mobile number. We’ll send a code to verify it."
-              : "Sign in with your mobile number. A verification code keeps it simple."}
+              ? t(
+                  "Create your account with a mobile number. We’ll send a code to verify it.",
+                )
+              : t(
+                  "Sign in with your mobile number. A verification code keeps it simple.",
+                )}
           </p>
           {isDemo && (
             <div className="ew-auth-notice" role="note" id="auth-demo-note">
-              <strong>You’re exploring a preview.</strong>
+              <strong>{t("You’re exploring a preview.")}</strong>
               <p>
-                This Laayoune beta works without an account. You can still
-                browse all the local directory.
+                {t(
+                  "This Laayoune beta works without an account. You can still browse all the local directory.",
+                ) + " "}
               </p>
               <Link to="/services">
-                Explore services <FiArrowRight aria-hidden="true" />
+                {t("Explore services") + " "}
+                <FiArrowRight aria-hidden="true" />
               </Link>
             </div>
           )}
@@ -189,18 +199,21 @@ export function AuthExperience({ createAccount = false }) {
             )}
             {createAccount && (
               <div className="ew-auth-field">
-                <label htmlFor="auth-name">Full name</label>
+                <label htmlFor="auth-name">{t("Full name")}</label>
                 <input
                   ref={nameRef}
                   id="auth-name"
                   name="name"
                   type="text"
                   autoComplete="name"
-                  placeholder="Your full name"
+                  placeholder={t("Your full name")}
                   value={fullName}
                   onChange={(event) => {
                     setFullName(event.target.value);
-                    setErrors((current) => ({ ...current, name: undefined }));
+                    setErrors((current) => ({
+                      ...current,
+                      name: undefined,
+                    }));
                   }}
                   disabled={busy}
                   required
@@ -215,7 +228,7 @@ export function AuthExperience({ createAccount = false }) {
               </div>
             )}
             <div className="ew-auth-field">
-              <label htmlFor="auth-phone">Mobile number</label>
+              <label htmlFor="auth-phone">{t("Mobile number")}</label>
               <input
                 ref={phoneRef}
                 id="auth-phone"
@@ -227,7 +240,10 @@ export function AuthExperience({ createAccount = false }) {
                 value={phone}
                 onChange={(event) => {
                   setPhone(event.target.value);
-                  setErrors((current) => ({ ...current, phone: undefined }));
+                  setErrors((current) => ({
+                    ...current,
+                    phone: undefined,
+                  }));
                 }}
                 disabled={busy}
                 required
@@ -242,7 +258,8 @@ export function AuthExperience({ createAccount = false }) {
                 </p>
               ) : (
                 <p className="ew-auth-help" id="auth-phone-help">
-                  Moroccan mobile number starting with 06, 07, or +212.
+                  {t("Moroccan mobile number starting with 06, 07, or +212.") +
+                    " "}
                 </p>
               )}
             </div>
@@ -252,28 +269,34 @@ export function AuthExperience({ createAccount = false }) {
               disabled={busy || isDemo}
               aria-describedby={isDemo ? "auth-demo-note" : undefined}
             >
-              <span>{busy ? "Sending code…" : "Send verification code"}</span>
+              <span>
+                {busy ? t("Sending code…") : t("Send verification code")}
+              </span>
               <FiArrowRight aria-hidden="true" />
             </button>
             <p className="ew-auth-reassurance">
-              <FiCheck aria-hidden="true" /> No password to remember.
+              <FiCheck aria-hidden="true" />
+              {t("No password to remember.") + " "}
             </p>
           </form>
           <p className="ew-auth-switch">
-            {createAccount ? "Already have an account?" : "New to EazyWed?"}{" "}
+            {createAccount
+              ? t("Already have an account?")
+              : t("New to Monasebty?")}{" "}
             <Link to={createAccount ? "/signin" : "/signup"}>
-              {createAccount ? "Sign in" : "Create an account"}
+              {createAccount ? t("Sign in") : t("Create an account")}
             </Link>
           </p>
           <div className="ew-auth-vendor">
-            <span>Here for your business?</span>
+            <span>{t("Here for your business?")}</span>
             <Link to="/vendor/login">
-              Vendor sign in <FiArrowRight aria-hidden="true" />
+              {t("Vendor sign in") + " "}
+              <FiArrowRight aria-hidden="true" />
             </Link>
           </div>
         </div>
         <span className="ew-auth-bottom-note">
-          A thoughtful beginning to a beautiful celebration.
+          {t("A thoughtful beginning to a beautiful celebration.") + " "}
         </span>
       </section>
       <Modal
@@ -287,12 +310,15 @@ export function AuthExperience({ createAccount = false }) {
         keyboard={!busy}
       >
         <Modal.Header closeButton={!busy}>
-          <Modal.Title id="auth-verify-title">Check your messages</Modal.Title>
+          <Modal.Title id="auth-verify-title">
+            {t("Check your messages")}
+          </Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <p>
-            Enter the six-digit code sent to <strong>{phone}</strong>. Your code
-            is valid for 10 minutes.
+            {t("Enter the six-digit code sent to") + " "}
+            <strong>{phone}</strong>
+            {t(". Your code is valid for 10 minutes.") + " "}
           </p>
           <form
             className="ew-auth-form"
@@ -301,7 +327,7 @@ export function AuthExperience({ createAccount = false }) {
             aria-busy={busy}
           >
             <div className="ew-auth-field">
-              <label htmlFor="auth-code">Verification code</label>
+              <label htmlFor="auth-code">{t("Verification code")}</label>
               <div className="ew-auth-code-control">
                 <input
                   ref={otpRef}
@@ -346,10 +372,10 @@ export function AuthExperience({ createAccount = false }) {
             </div>
             <button type="submit" className="ew-auth-submit" disabled={busy}>
               {busy
-                ? "Verifying…"
+                ? t("Verifying…")
                 : createAccount
-                  ? "Verify and create account"
-                  : "Verify and sign in"}
+                  ? t("Verify and create account")
+                  : t("Verify and sign in")}
               <FiArrowRight aria-hidden="true" />
             </button>
             <button
@@ -358,7 +384,7 @@ export function AuthExperience({ createAccount = false }) {
               onClick={closeVerification}
               disabled={busy}
             >
-              Change number or request a new code
+              {t("Change number or request a new code") + " "}
             </button>
           </form>
         </Modal.Body>
@@ -367,7 +393,6 @@ export function AuthExperience({ createAccount = false }) {
     </main>
   );
 }
-
 export default function SignIn() {
   return <AuthExperience />;
 }

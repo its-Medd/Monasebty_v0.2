@@ -135,7 +135,7 @@ export const createService = async (req, res) => {
     await newService.save();
     res.status(201).json({ message: "Service created successfully", service: newService });
   } catch (error) {
-    console.error("Error creating service:", error);
+    console.error("Error creating service:", String(error?.message || "").replace(/[\r\n]/g, ""));
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
@@ -170,7 +170,7 @@ export const updateService = async (req, res) => {
 
     res.status(200).json({ message: "Service updated successfully", service: updatedService });
   } catch (error) {
-    console.error("Error updating service:", error);
+    console.error("Error updating service:", String(error?.message || "").replace(/[\r\n]/g, ""));
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };

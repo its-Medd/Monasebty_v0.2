@@ -318,7 +318,7 @@ export const verifyVendorOtp = async (req, res) => {
     otpRecord.verified = true
     await otpRecord.save()
 
-    let user = await User.findOne({ phone: { $eq: phone } })
+    const user = await User.findOne({ phone: { $eq: phone } })
     const hashedPassword = await bcrypt.hash(password, 10)
     let brandIconUrl
 
@@ -353,7 +353,7 @@ export const verifyVendorOtp = async (req, res) => {
       await user.save()
     } else {
       // Create new user
-      user = await User.create({
+      await User.create({
         phone,
         username, // Set username explicitly here
         full_name: vendorRequest.full_name || phone.slice(-10),

@@ -17,7 +17,7 @@ export default function ContactUs() {
   const formRef = useRef(null);
 
   useEffect(() => {
-    document.title = "Contact us | EazyWed";
+    document.title = "Contact us | Monasebty";
   }, []);
 
   const update = (event) => {
@@ -115,7 +115,7 @@ export default function ContactUs() {
             </h1>
             <p>
               Have a question about planning, finding a vendor, or using
-              EazyWed? Tell us what you need a hand with.
+              Monasebty? Tell us what you need a hand with.
             </p>
             <div className="ew-contact-guide">
               <span className="ew-contact-guide-icon" aria-hidden="true">

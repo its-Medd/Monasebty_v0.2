@@ -1,5 +1,5 @@
 // Frontend-only beta directory. No Atlas connection, seed, account, or booking writes.
-// Public listing checks: 2026-11-04. Directory entries are not partner endorsements.
+// Public listing checks: 2026-11-05. Directory entries are not partner endorsements.
 export const BETA_MODE = import.meta.env?.VITE_BETA_MODE !== "false";
 export const BETA_CITY = "Laayoune";
 export const BETA_CATEGORIES = ["Wedding Venues", "Catering", "Photographers"];
@@ -93,24 +93,41 @@ export const vendors = [
   reviewCount: null,
   discount: null,
   refundPolicy: "Not published",
-  checkedAt: "2026-11-04",
+  checkedAt: "2026-11-05",
 }));
+const categoryAliases = {
+  "Wedding Venues":
+    "قاعة قاعات الأفراح افراح اعراس أعراس حفلات salle salles mariage",
+  Catering: "تموين ممون مموني حفلات traiteur traiteurs restauration",
+  Photographers:
+    "تصوير مصور مصورين فوتوغرافي فيديو photographes photographie photographe",
+};
+const nameAliases = {
+  "laayoune-taj-el-aarouss": "تاج العروس قاعة تاج العروس",
+  "laayoune-machawi-dajaj": "مشاوي الدجاج",
+  "laayoune-afrah": "أفراح افراح العيون",
+  "laayoune-diafa": "فضاء ضيافة العيون",
+  "laayoune-photo-chabab": "مختبر صور الشباب شباب",
+  "laayoune-video-asila": "نادي فيديو أصيلة أصيلا اصيلة اسيلة",
+};
 const normalized = (value) =>
   String(value || "")
     .normalize("NFD")
     .replace(/\p{Diacritic}/gu, "")
+    .replace(/ـ/g, "")
+    .replace(/[أإآ]/g, "ا")
     .toLowerCase();
-export function queryVendors(category = "all", params = {}) {
-  const matched = vendors.filter(
+export function queryVendors(category = "all", params = {}, entries = vendors) {
+  const matched = entries.filter(
     (v) =>
       (!category || category === "all" || v.category === category) &&
       (!params.category ||
         params.category === "all" ||
         v.category === params.category) &&
       (!params.query ||
-        normalized(`${v.title} ${v.category} ${v.description}`).includes(
-          normalized(params.query),
-        )) &&
+        normalized(
+          `${v.title} ${v.category} ${v.description} ${categoryAliases[v.category] || ""} ${nameAliases[v.id] || ""}`,
+        ).includes(normalized(params.query))) &&
       (!params.city ||
         String(params.city)
           .split(",")

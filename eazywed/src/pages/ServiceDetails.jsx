@@ -122,7 +122,7 @@ const ServiceDetails = () => {
         const data = await fetchServiceDetails(id);
         if (!current) return;
         setService(data);
-        document.title = `${data.name} - Service Details | EazyWed`;
+        document.title = `${data.name} - Service Details | Monasebty`;
       } catch (err) {
         if (!current) return;
         if (err.response?.status === 403) {

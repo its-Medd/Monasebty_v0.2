@@ -1,11 +1,16 @@
 import { useEffect, useState } from "react";
-const KEY = "eazywed-laayoune-shortlist-v1";
+const KEY = "monasebty-laayoune-shortlist-v1";
+const LEGACY_KEY = "eazywed-laayoune-shortlist-v1";
 let memoryFallback;
 function read() {
   if (memoryFallback) return memoryFallback;
   try {
-    const value = JSON.parse(localStorage.getItem(KEY) || "[]");
-    return Array.isArray(value) ? value : [];
+    const value = JSON.parse(
+      localStorage.getItem(KEY) || localStorage.getItem(LEGACY_KEY) || "[]",
+    );
+    return Array.isArray(value)
+      ? value.filter((item) => item && typeof item.id === "string")
+      : [];
   } catch {
     return [];
   }

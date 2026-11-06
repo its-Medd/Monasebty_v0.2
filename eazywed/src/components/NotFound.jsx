@@ -1,33 +1,35 @@
-import { useEffect } from "react";
+import { usePageTitle } from "../i18n/usePageTitle";
+import { useLocale } from "../i18n/useLocale";
+import "react";
 import { Link } from "react-router-dom";
 import Navbar from "../pages/common/Navbar";
 import Footer from "../pages/common/Footer";
 import EstimateSidebar from "../pages/common/EstimateSidebar";
 export default function NotFound() {
-  useEffect(() => {
-    document.title = "Page not found | EazyWed";
-  }, []);
+  usePageTitle("Page not found");
+  const { t } = useLocale();
   return (
     <>
       <Navbar />
       <EstimateSidebar />
       <main id="main-content" className="ew-shell ew-preview-gateway">
-        <span className="ew-eyebrow">404 · A little detour</span>
+        <span className="ew-eyebrow">{t("404 · A little detour")}</span>
         <h1 className="ew-page-title">
-          Let's find your way
+          {t("Let's find your way") + " "}
           <br />
-          <em>back to the celebration.</em>
+          <em>{t("back to the celebration.")}</em>
         </h1>
         <p>
-          This page may have moved, or the address may be incomplete. Your next
-          great wedding find is still waiting.
+          {t(
+            "This page may have moved, or the address may be incomplete. Your next great wedding find is still waiting.",
+          ) + " "}
         </p>
         <div>
           <Link className="ew-button" to="/services">
-            Explore wedding vendors ↗
+            {t("Explore wedding vendors ↗") + " "}
           </Link>
           <Link className="ew-text-link" to="/">
-            Back to home
+            {t("Back to home") + " "}
           </Link>
         </div>
       </main>

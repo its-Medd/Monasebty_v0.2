@@ -1,7 +1,10 @@
 export const normalizeCardRequest = (req, res, next) => {
   try {
     const contentType = req.headers["content-type"] || "";
-    console.log(`Card normalizer: ${req.method} ${req.path} (${contentType.split(';')[0]})`);
+    const safeContentType = String(contentType.split(';')[0]).replace(/[\r\n]/g, "");
+    const safeMethod = String(req.method || "").replace(/[\r\n]/g, "");
+    const safePath = String(req.path || "").replace(/[\r\n]/g, "");
+    console.log(`Card normalizer: ${safeMethod} ${safePath} (${safeContentType})`);
 
     if (contentType.startsWith("multipart/form-data")) {
       const fields = req.body;
@@ -31,7 +34,9 @@ export const normalizeCardRequest = (req, res, next) => {
       if (fields.settings) {
         try {
           const settingsType = typeof fields.settings;
-          console.log(`Processing settings (${settingsType}, length: ${settingsType === 'string' ? fields.settings.length : 'unknown'})`);
+          const rawSettingsLength = settingsType === 'string' ? fields.settings.length : -1;
+          const safeLengthForLog = String(rawSettingsLength).replace(/[\r\n]/g, "");
+          console.log(`Processing settings (${settingsType}, length: ${safeLengthForLog})`);
           
           if (settingsType === 'string') {
             const testParse = JSON.parse(fields.settings);

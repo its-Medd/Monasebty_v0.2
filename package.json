@@ -1,5 +1,5 @@
 {
-  "name": "eazywed-local",
+  "name": "monasebty-local",
   "private": true,
   "scripts": {
     "install:all": "npm --prefix backend ci && npm --prefix eazywed ci",

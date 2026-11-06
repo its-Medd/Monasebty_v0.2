@@ -86,11 +86,15 @@ export const updateCardTemplate = async (req, res) => {
     const cardId = req.params.cardId
     const updateData = req.normalizedBody
 
-    console.log(`Updating card ${cardId} with fields: ${Object.keys(updateData).join(", ")}`)
+    const safeCardId = String(cardId || "").replace(/[\r\n]/g, "")
+    const safeVendorId = String(vendorId || "").replace(/[\r\n]/g, "")
+    const safeFields = String(Object.keys(updateData || {}).join(", ")).replace(/[\r\n]/g, "")
+
+    console.log(`Updating card ${safeCardId} with fields: ${safeFields}`)
     
     const card = await CardTemplate.findOne({ _id: { $eq: cardId }, vendor_id: { $eq: vendorId } })
     if (!card) {
-      console.log(`Card ${cardId} not found for vendor ${vendorId}`)
+      console.log(`Card ${safeCardId} not found for vendor ${safeVendorId}`)
       return res.status(404).json({ message: "Card template not found" })
     }
 
@@ -185,17 +189,17 @@ export const updateCardTemplate = async (req, res) => {
     )
 
     if (!updatedCard) {
-      console.error(`Failed to update card ${cardId}`)
+      console.error(`Failed to update card ${safeCardId}`)
       return res.status(500).json({ message: "Failed to update card" })
     }
 
-    console.log(`Card ${cardId} updated successfully`)
+    console.log(`Card ${safeCardId} updated successfully`)
     res.status(200).json({ 
       message: "Card template updated successfully", 
       card: updatedCard 
     })
   } catch (error) {
-    console.error("Error updating card template:", error.message)
+    console.error("Error updating card template:", String(error?.message || error || "").replace(/[\r\n]/g, ""))
     res.status(500).json({ 
       message: "Failed to update card", 
       error: error.message || "Unknown error" 

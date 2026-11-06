@@ -830,11 +830,9 @@ const CardEditor = () => {
         shape.set("_shape", "rect")
     }
 
-    if (shape) {
-      fabricCanvasRef.current.add(shape)
-      fabricCanvasRef.current.setActiveObject(shape)
-      fabricCanvasRef.current.renderAll()
-    }
+    fabricCanvasRef.current.add(shape)
+    fabricCanvasRef.current.setActiveObject(shape)
+    fabricCanvasRef.current.renderAll()
   }
 
   const handleSetBackgroundImage = (e) => {
@@ -1527,7 +1525,7 @@ const CardEditor = () => {
       <nav className="editor-navbar">
         <div className="container-fluid">
           <a className="navbar-brand" href="#">
-            EazyWed Card Editor
+            Monasebty Card Editor
           </a>
           <div className="editor-nav-actions">
             <button

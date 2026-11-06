@@ -16,7 +16,7 @@ const Chatbot = () => {
     } else {
       const welcomeMessage = {
         sender: 'bot',
-        text: 'Welcome to EazyWed Chat! How can I assist you with your wedding today?',
+        text: 'Welcome to Monasebty Chat! How can I assist you with your wedding today?',
         timestamp: new Date().toISOString(),
       };
       setMessages([welcomeMessage]);
@@ -81,7 +81,7 @@ const Chatbot = () => {
           <Link to="/" className="back-arrow">
             <i className="fas fa-arrow-left"></i>
           </Link>
-          <h1>EazyWed Chat Assistant</h1>
+          <h1>Monasebty Chat Assistant</h1>
           <button className="clear-chat-btn" onClick={clearChat}>
             Clear
           </button>

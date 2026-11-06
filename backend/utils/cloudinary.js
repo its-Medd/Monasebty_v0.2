@@ -64,7 +64,7 @@ export const uploadServiceImages = async (images) => {
     const results = await Promise.all(uploadPromises)
     return results.map((result) => result.secure_url)
   } catch (error) {
-    console.error("Cloudinary service images upload error:", error)
+    console.error("Cloudinary service images upload error:", String(error?.message || "").replace(/[\r\n]/g, ""))
     throw new Error(error.message || "Failed to upload service images")
   }
 }

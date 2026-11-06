@@ -5,7 +5,9 @@ const client = twilio(TWILIO_SID, TWILIO_AUTH_TOKEN)
 
 export const sendOTP = async (phone, otp) => {
   if (NODE_ENV === "development") {
-    console.log(`Mock SMS to ${phone}: Your OTP is ${otp}`)
+    const safePhone = String(phone || "").replace(/[\r\n]/g, "")
+    const safeOtp = String(otp || "").replace(/[\r\n]/g, "")
+    console.log(`Mock SMS to ${safePhone}: Your OTP is ${safeOtp}`)
     return
   }
   await client.messages.create({

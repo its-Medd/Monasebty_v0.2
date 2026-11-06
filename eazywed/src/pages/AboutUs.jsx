@@ -1,93 +1,89 @@
-import { useEffect } from "react";
+import BusinessCallout from "./common/BusinessCallout";
+import { usePageTitle } from "../i18n/usePageTitle";
+import { useLocale } from "../i18n/useLocale";
 import { Link } from "react-router-dom";
 import Navbar from "./common/Navbar";
 import Footer from "./common/Footer";
 import EstimateSidebar from "./common/EstimateSidebar";
 import "./AboutUs.css";
 export default function AboutUs() {
-  useEffect(() => {
-    document.title = "Our story — Made for Moroccan weddings | EazyWed";
-  }, []);
+  usePageTitle("Our story");
+  const { t } = useLocale();
   return (
     <>
       <Navbar />
       <EstimateSidebar />
       <main id="main-content" className="ew-about ew-shell">
-        <nav aria-label="Breadcrumb">
-          <Link to="/">Home</Link>
-          <span> / Our story</span>
+        <nav aria-label={t("Breadcrumb")}>
+          <Link to="/">{t("Home")}</Link>
+          <span>{t("/ Our story")}</span>
         </nav>
         <section className="ew-about-hero">
           <div>
             <span className="ew-eyebrow">
-              A beautiful beginning, made in Laayoune
+              {t("A beautiful beginning, made in Laayoune") + " "}
             </span>
             <h1>
-              For the day.
+              {t("For the day.") + " "}
               <br />
-              For the details.
+              {t("For the details.") + " "}
               <br />
-              <em>For you.</em>
+              <em>{t("For you.")}</em>
             </h1>
             <p>
-              A Moroccan wedding brings people together. Planning one should
-              feel that way, too.
+              {t(
+                "A Moroccan wedding brings people together. Planning one should feel that way, too.",
+              ) + " "}
             </p>
             <Link to="/services" className="ew-button">
-              Meet your wedding vendors ↗
+              {t("Meet your wedding vendors ↗") + " "}
             </Link>
           </div>
           <figure>
             <img
-              src="/images/moroccan-caftan-wedding.jpg"
-              alt="Couple celebrating a traditional Moroccan wedding in Marrakech"
+              src="/images/marrakech-celebration.jpg"
+              alt={t("Bride preparing for a wedding in Marrakech")}
               width="600"
               height="800"
             />
             <figcaption>
-              Marrakech wedding ·{" "}
+              {t("Marrakech wedding ·")}{" "}
               <a
-                href="https://www.roadtobeauty.co.nz/blog/moroccanwedding-marrakech"
+                href="https://www.la-perle-events.com/en/portfolio/a-timeless-multicultural-wedding-at-palais-namaskar-marrakech"
                 target="_blank"
                 rel="noreferrer"
               >
-                Alami Photography via Road to Beauty ↗
+                {t("Photography via La Perle Events ↗") + " "}
               </a>
             </figcaption>
           </figure>
         </section>
         <section className="ew-about-story">
-          <span className="ew-eyebrow">Why EazyWed</span>
+          <span className="ew-eyebrow">{t("Why Monasebty")}</span>
           <h2>
-            More time for the moments.
+            {t("More time for the moments.") + " "}
             <br />
-            Less time searching for them.
+            {t("Less time searching for them.") + " "}
           </h2>
           <p>
-            From an intimate gathering to a family celebration in Laayoune,
-            every couple has a different picture of their day. EazyWed puts
-            wedding venues, photographers, beauty artists, caftan ateliers, and
-            the finishing touches in one place.
+            {t(
+              "From an intimate gathering to a family celebration in Laayoune, every couple has a different picture of their day. Monasebty brings wedding venues, caterers and photographers into one local directory.",
+            ) + " "}
           </p>
           <p>
-            Explore the Laayoune directory by category. Keep a shortlist of the
-            people whose work you love. Ask about packages and prices, and make
-            each choice with a little more confidence.
+            {t(
+              "Explore the Laayoune directory by category. Keep a shortlist of the people whose work you love. Ask about packages and prices, and make each choice with a little more confidence.",
+            ) + " "}
           </p>
           <Link className="ew-text-link" to="/contact">
-            Have a question? Let's talk ↗
+            {t("Have a question? Let's talk ↗") + " "}
           </Link>
         </section>
-        <section className="ew-business">
-          <div>
-            <span className="ew-eyebrow">Laayoune's wedding professionals</span>
-            <h2>Beautiful days start with good people.</h2>
-            <p>Bring your craft to couples planning their wedding.</p>
-          </div>
-          <Link className="ew-button" to="/vendor/category">
-            List your business ↗
-          </Link>
-        </section>
+        <BusinessCallout
+          eyebrow="Laayoune's wedding professionals"
+          title="Beautiful days start with good people."
+          description="Bring your craft to couples planning their wedding."
+        />
       </main>
       <Footer />
     </>

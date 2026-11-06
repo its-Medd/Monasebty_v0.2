@@ -24,6 +24,53 @@ const storage = multer.diskStorage({
   },
 })
 
+const ALLOWED_SERVICE_DETAILS = [
+  "amenities",
+  "bust",
+  "cancellation_policy",
+  "catering_type",
+  "cities_covered",
+  "design",
+  "doors",
+  "expertise",
+  "has_team",
+  "home_service",
+  "length",
+  "location_type",
+  "material",
+  "mehndi_type",
+  "parking_space",
+  "rental_duration",
+  "seats",
+  "sells_mehndi",
+  "services_for",
+  "size",
+  "staff",
+  "transmission",
+  "venue_type",
+  "wheelchair_accessible",
+]
+
+const ALLOWED_VENDOR_REQUEST_FIELDS = [
+  "status",
+  "submittedAt",
+  "phone_whatsapp",
+  "whatsapp_number",
+  "category",
+  "brand_icon",
+  "brand_name",
+  "full_name",
+  "email",
+  "instagram_link",
+  "facebook_link",
+  "booking_email",
+  "office_address",
+  "website_link",
+  "map_link",
+  "terms_accepted",
+  "rejectionCount",
+]
+
 // File filter function
 const fileFilter = (req, file, cb) => {
   // Accept only image files
@@ -123,26 +170,13 @@ export const normalizeServiceData = (req, res, next) => {
     // Process service details based on category
     const details = {}
     
-    // Iterate through all fields that might be category-specific
+    // Only process allowed service details fields
     for (const [key, value] of Object.entries(req.body)) {
-      // Skip fields processed earlier
       if (
-        ![
-          "category",
-          "name",
-          "address",
-          "location_map",
-          "description",
-          "additional_info",
-          "price_range",
-          "discount",
-          "discount_expiry",
-          "working_hours",
-          "working_days",
-          "packageName",
-          "packagePrice",
-          "packageInclusions",
-        ].includes(key)
+        ALLOWED_SERVICE_DETAILS.includes(key) &&
+        key !== "__proto__" &&
+        key !== "constructor" &&
+        key !== "prototype"
       ) {
         // Convert true/false strings to boolean
         if (value === "true") details[key] = true
@@ -151,7 +185,7 @@ export const normalizeServiceData = (req, res, next) => {
         else if (Array.isArray(value)) details[key] = value
         // Convert comma-separated values to arrays
         else if (typeof value === "string" && (key === "amenities" || key === "cities_covered")) {
-          details[key] = value.split(",").map(item => item.trim())
+          details[key] = value.split(",").map((item) => item.trim())
         }
         // Convert numbers
         else if (!isNaN(value) && typeof value === "string" && value !== "") {
@@ -240,17 +274,27 @@ export const normalizeServiceRequest = (req, res, next) => {
       const details = {}
       for (const key in req.body) {
         if (key.startsWith("details[")) {
-          const field = key.match(/details\[(.*?)\]/)[1]
+          const match = key.match(/^details\[([a-zA-Z0-9_]+)\](\[\])?$/)
+          if (!match) continue
+          const field = match[1]
+          if (
+            !ALLOWED_SERVICE_DETAILS.includes(field) ||
+            field === "__proto__" ||
+            field === "constructor" ||
+            field === "prototype"
+          ) {
+            continue
+          }
+
           if (key.endsWith("[]")) {
             // Handle array fields
-            const arrayField = field.replace("[]", "")
-            if (!details[arrayField]) {
-              details[arrayField] = []
+            if (!details[field]) {
+              details[field] = []
             }
             if (Array.isArray(req.body[key])) {
-              details[arrayField] = req.body[key]
+              details[field] = req.body[key]
             } else {
-              details[arrayField].push(req.body[key])
+              details[field].push(req.body[key])
             }
           } else {
             let value = req.body[key]
@@ -319,11 +363,20 @@ export const normalizeVendorRequest = (req, res, next) => {
       const vendorRequest = {}
       for (const key in req.body) {
         if (key.startsWith("vendorRequest[")) {
-          const field = key.slice(14, -1)
-          let value = req.body[key]
-          if (value === "true") value = true
-          if (value === "false") value = false
-          vendorRequest[field] = value
+          const match = key.match(/^vendorRequest\[([a-zA-Z0-9_]+)\]$/)
+          if (!match) continue
+          const field = match[1]
+          if (
+            ALLOWED_VENDOR_REQUEST_FIELDS.includes(field) &&
+            field !== "__proto__" &&
+            field !== "constructor" &&
+            field !== "prototype"
+          ) {
+            let value = req.body[key]
+            if (value === "true") value = true
+            if (value === "false") value = false
+            vendorRequest[field] = value
+          }
         }
       }
 

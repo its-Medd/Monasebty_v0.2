@@ -1,3 +1,30 @@
+const ALLOWED_SERVICE_DETAILS = [
+  "amenities",
+  "bust",
+  "cancellation_policy",
+  "catering_type",
+  "cities_covered",
+  "design",
+  "doors",
+  "expertise",
+  "has_team",
+  "home_service",
+  "length",
+  "location_type",
+  "material",
+  "mehndi_type",
+  "parking_space",
+  "rental_duration",
+  "seats",
+  "sells_mehndi",
+  "services_for",
+  "size",
+  "staff",
+  "transmission",
+  "venue_type",
+  "wheelchair_accessible",
+]
+
 export const normalizeServiceRequest = (req, res, next) => {
   try {
     req.normalizedBody = {}
@@ -24,16 +51,26 @@ export const normalizeServiceRequest = (req, res, next) => {
       const details = {}
       for (const key in req.body) {
         if (key.startsWith("details[")) {
-          const field = key.match(/details\[(.*?)\]/)[1]
+          const match = key.match(/^details\[([a-zA-Z0-9_]+)\](\[\])?$/)
+          if (!match) continue
+          const field = match[1]
+          if (
+            !ALLOWED_SERVICE_DETAILS.includes(field) ||
+            field === "__proto__" ||
+            field === "constructor" ||
+            field === "prototype"
+          ) {
+            continue
+          }
+
           if (key.endsWith("[]")) {
-            const arrayField = field.replace("[]", "")
-            if (!details[arrayField]) {
-              details[arrayField] = []
+            if (!details[field]) {
+              details[field] = []
             }
             if (Array.isArray(req.body[key])) {
-              details[arrayField] = req.body[key]
+              details[field] = req.body[key]
             } else {
-              details[arrayField].push(req.body[key])
+              details[field].push(req.body[key])
             }
           } else {
             let value = req.body[key]

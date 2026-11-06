@@ -143,3 +143,11 @@
     margin-top: 8px;
   }
 }
+.ew-copy-status {
+  display: block;
+  min-height: 20px;
+  font-size: 11px;
+  line-height: 1.6;
+  color: var(--ew-muted);
+  margin-top: 10px;
+}

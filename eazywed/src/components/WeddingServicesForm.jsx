@@ -628,9 +628,8 @@ const WeddingServicesForm = () => {
         }
       }
 
-      let response;
       if (isEditMode) {
-        response = await api.put(
+        await api.put(
           `/vendor/dashboard/services/${serviceId}`,
           serviceFormData,
           {
@@ -639,7 +638,7 @@ const WeddingServicesForm = () => {
         );
         toast.success("Service updated successfully and is awaiting approval.");
       } else {
-        response = await api.post(
+        await api.post(
           "/vendor/dashboard/services",
           serviceFormData,
           {

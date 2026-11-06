@@ -1,3 +1,4 @@
+import BetaHelp from "./pages/BetaHelp";
 import { BETA_MODE } from "./data/laayoune";
 ("use client");
 
@@ -132,7 +133,7 @@ const AppRoutes = () => (
       <Route path="/services/:category/:id" element={<ServiceDetails />} />
       <Route path="/cards/:id" element={<WeddingCardsDetails />} />
       <Route path="/deals" element={<Deals />} />
-      <Route path="/contact" element={<ContactUs />} />
+      <Route path="/contact" element={BETA_MODE?<BetaHelp/>:<ContactUs/>} />
       <Route path="/about" element={<AboutUs />} />
       <Route
         path="/chatbot"

@@ -15,7 +15,7 @@ test("beta is a frontend-only Laayoune directory with sourced real entries", () 
   for (const v of vendors) {
     assert.equal(v.city, "Laayoune");
     assert.ok(v.sourceUrl.startsWith("https://"));
-    assert.equal(v.checkedAt, "2026-11-04");
+    assert.equal(v.checkedAt, "2026-11-05");
     assert.equal(v.price, null);
     assert.equal(v.rating, null);
     assert.equal(v.discount, null);
@@ -42,6 +42,37 @@ test("directory search handles accents and case", () => {
   assert.equal(
     queryVendors("all", { query: "DIAFA" }).data[0].title,
     "Espace Laâyoune Diafa",
+  );
+});
+test("Arabic and French searches find the same local service categories", () => {
+  assert.equal(
+    queryVendors("all", { query: "قاعات الأفراح" }).pagination.total,
+    1,
+  );
+  assert.equal(queryVendors("all", { query: "تموين" }).pagination.total, 3);
+  assert.equal(queryVendors("all", { query: "تصوير" }).pagination.total, 2);
+  assert.equal(queryVendors("all", { query: "traiteurs" }).pagination.total, 3);
+  assert.equal(
+    queryVendors("all", { query: "photographes" }).pagination.total,
+    2,
+  );
+});
+test("Arabic business aliases tolerate accents and diacritics", () => {
+  assert.equal(
+    queryVendors("all", { query: "ضيافة" }).data[0].id,
+    "laayoune-diafa",
+  );
+  assert.equal(
+    queryVendors("all", { query: "تاج العَرُوس" }).data[0].id,
+    "laayoune-taj-el-aarouss",
+  );
+  assert.equal(
+    queryVendors("all", { query: "اصيلة" }).data[0].id,
+    "laayoune-video-asila",
+  );
+  assert.equal(
+    queryVendors("Catering", { query: "الشباب" }).pagination.total,
+    0,
   );
 });
 test("alphabetical sorting happens before pagination", () => {

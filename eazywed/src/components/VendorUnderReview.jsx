@@ -12,10 +12,10 @@ const VendorUnderReview = () => {
   return (
     <div className="main-container">
       <div className="logo-onboarding" style={{ backgroundImage: `url(${onboardingImg})` }}>
-        <h1 className="logo">EazyWed</h1>
+        <h1 className="logo">Monasebty</h1>
       </div>
       <div className="sign-in-form">
-        <h4>Welcome to EazyWed</h4>
+        <h4>Welcome to Monasebty</h4>
         <h5>Application Under Review</h5>
         <p className="review-message">
           Thank you for registering as a vendor! Your application has been submitted and is currently under review by

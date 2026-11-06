@@ -1,88 +1,101 @@
+import { useLocale } from "../../i18n/useLocale";
+import { createElement } from "react";
 import { Link } from "react-router-dom";
-import { FiHeart, FiMapPin, FiArrowUpRight } from "react-icons/fi";
+import {
+  FiHeart,
+  FiMapPin,
+  FiArrowUpRight,
+  FiCamera,
+  FiCoffee,
+  FiHome,
+} from "react-icons/fi";
 import { useShortlist } from "./useShortlist";
 import "./ServiceCard.css";
+import { weddingInspiration } from "../../data/weddingInspiration";
+const icons = {
+  "Wedding Venues": FiHome,
+  Catering: FiCoffee,
+  Photographers: FiCamera,
+};
 export default function ServiceCard({ service }) {
+  const { t, vendorText } = useLocale();
   const { isSaved, toggleSaved } = useShortlist();
   const saved = isSaved(service.id);
+  const inspiration = weddingInspiration[service.id];
   const path =
     service.type === "card"
       ? `/cards/${service.id}`
       : `/services/${encodeURIComponent(service.category)}/${service.id}`;
   return (
     <article className="ew-vendor-card">
-      <div className="ew-vendor-image">
-        <Link to={path} tabIndex={-1} aria-hidden="true">
-          {service.image ? (
-            <img
-              src={service.image}
-              alt=""
-              loading="lazy"
-              width="600"
-              height="450"
-            />
-          ) : (
-            <div className="ew-vendor-placeholder">
-              <span>
-                {service.title
-                  .split(" ")
-                  .filter((s) => s.length > 2)
-                  .slice(0, 2)
-                  .map((s) => s[0])
-                  .join("")}
-              </span>
-              <small>LAAYOUNE · PUBLIC LISTING</small>
-              <p>Business photos not supplied</p>
-            </div>
-          )}
-        </Link>
-        {service.discount && (
-          <span className="ew-vendor-discount">{service.discount}</span>
-        )}
-        <button
-          className={`ew-save ${saved ? "is-saved" : ""}`}
-          type="button"
-          aria-label={`${saved ? "Remove" : "Save"} ${service.title}${saved ? " from" : " to"} shortlist`}
-          aria-pressed={saved}
-          onClick={() => toggleSaved(service)}
-        >
-          <FiHeart aria-hidden="true" />
-        </button>
-      </div>
-      <div className="ew-vendor-meta">
-        <span>{service.category}</span>
-        {Number(service.rating) > 0 && (
-          <span className="ew-vendor-rating">
-            ★ {service.rating} ({service.reviewCount})
+      {inspiration && (
+        <figure className="ew-vendor-photo">
+          <img
+            src={inspiration.src}
+            alt={t("Moroccan wedding inspiration")}
+            width="1000"
+            height="1500"
+            loading="lazy"
+            style={{ objectPosition: inspiration.position }}
+          />
+          <figcaption>
+            <a
+              href={inspiration.source}
+              target="_blank"
+              rel="noreferrer"
+              title={`${t("Photo source")}: ${inspiration.credit}`}
+            >
+              {t("Wedding inspiration · Not a business photo")} ↗
+            </a>
+          </figcaption>
+        </figure>
+      )}
+      <div className="ew-vendor-card-content">
+        <div className="ew-vendor-card-top">
+          <span className="ew-vendor-category">
+            {createElement(icons[service.category] || FiHome, {
+              "aria-hidden": true,
+            })}
+            {t(service.category)}
           </span>
-        )}
-      </div>
-      <h3>
-        <Link to={path}>
-          {service.title}
-          <FiArrowUpRight aria-hidden="true" />
-        </Link>
-      </h3>
-      <p className="ew-vendor-location">
-        <FiMapPin aria-hidden="true" />
-        {service.city}
-      </p>
-      <div className="ew-vendor-bottom">
-        <span>
-          {service.price != null ? (
-            <>
-              <span>From </span>
-              <strong>
-                {Number(service.price).toLocaleString("fr-MA")} MAD
-              </strong>
-            </>
-          ) : (
-            <strong>Request a quote</strong>
-          )}
-        </span>
-        <span className="ew-card-arrow" aria-hidden="true">
-          ↗
-        </span>
+          <button
+            type="button"
+            className={`ew-save ${saved ? "is-saved" : ""}`}
+            aria-label={t(
+              saved
+                ? "Remove {name} from shortlist"
+                : "Save {name} to shortlist",
+              { name: service.title },
+            )}
+            aria-pressed={saved}
+            onClick={() => toggleSaved(service)}
+          >
+            <FiHeart aria-hidden="true" />
+          </button>
+        </div>
+        <h3>
+          <Link to={path}>
+            <bdi>{service.title}</bdi>
+            <FiArrowUpRight aria-hidden="true" />
+          </Link>
+        </h3>
+        <p className="ew-vendor-summary">
+          {vendorText(service, "description")}
+        </p>
+        <p className="ew-vendor-location">
+          <FiMapPin aria-hidden="true" />
+          <span>
+            {vendorText(service, "address") ||
+              t("Laayoune · Address on request")}
+          </span>
+        </p>
+        <div className="ew-vendor-bottom">
+          <strong>{t("Quote on request")}</strong>
+          <Link to={path}>
+            {t("View details") + " "}
+            <span aria-hidden="true">↗</span>
+          </Link>
+        </div>
       </div>
     </article>
   );

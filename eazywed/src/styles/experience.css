@@ -11,6 +11,8 @@
   --ew-danger: #a02d3a;
   --ew-display: "Cormorant Garamond", Georgia, serif;
   --ew-body: "Manrope", Arial, sans-serif;
+  --ew-arabic-body: "IBM Plex Sans Arabic", Tahoma, sans-serif;
+  --ew-arabic-display: "Alexandria Variable", Tahoma, sans-serif;
   --bs-body-font-family: var(--ew-body);
   --bs-body-color: var(--ew-ink);
   --bs-primary: #183e35;

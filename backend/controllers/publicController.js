@@ -17,7 +17,9 @@ const formatResponse = (data, pagination = null) => {
 };
 
 const handleError = (res, error, customMessage = "Server error") => {
-  console.error(`${customMessage}:`, error);
+  const safeMessage = String(customMessage).replace(/[\r\n]/g, "");
+  const safeError = String(error?.message || error || "").replace(/[\r\n]/g, "");
+  console.error(`${safeMessage}:`, safeError);
   if (error instanceof mongoose.Error.CastError) {
     return res.status(400).json({ message: "Invalid ID format" });
   }
@@ -568,26 +570,28 @@ export const getCardDetails = async (req, res) => {
 export const editCardTemplate = async (req, res) => {
   try {
     const { id } = req.params;
-    console.log(`Fetching card template for editing: ID=${id}, User=${req.user?._id}`);
+    const safeId = String(id || "").replace(/[\r\n]/g, "");
+    const safeUserId = String(req.user?._id || "").replace(/[\r\n]/g, "");
+    console.log(`Fetching card template for editing: ID=${safeId}, User=${safeUserId}`);
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
-      console.error(`Invalid card ID format: ${id}`);
+      console.error(`Invalid card ID format: ${safeId}`);
       return res.status(400).json({ message: "Invalid card ID" });
     }
 
     const card = await CardTemplate.findById(id).lean();
     if (!card) {
-      console.error(`Card template not found: ID=${id}`);
+      console.error(`Card template not found: ID=${safeId}`);
       return res.status(404).json({ message: "Card template not found" });
     }
 
     if (card.status !== "published") {
-      console.error(`Card template not published: ID=${id}, Status=${card.status}`);
+      console.error(`Card template not published: ID=${safeId}, Status=${String(card.status).replace(/[\r\n]/g, "")}`);
       return res.status(403).json({ message: "Card template is not published" });
     }
 
     if (card.type !== "editable") {
-      console.error(`Card is not editable: ID=${id}, Type=${card.type}`);
+      console.error(`Card is not editable: ID=${safeId}, Type=${String(card.type).replace(/[\r\n]/g, "")}`);
       return res.status(400).json({ message: "Only editable card templates can be edited" });
     }
 
@@ -595,19 +599,19 @@ export const editCardTemplate = async (req, res) => {
     if (typeof settings === "string") {
       try {
         settings = JSON.parse(settings);
-        console.log(`Parsed card settings: ID=${id}`);
+        console.log(`Parsed card settings: ID=${safeId}`);
       } catch (error) {
-        console.error(`Error parsing card settings: ID=${id}, Error=${error.message}`);
+        console.error(`Error parsing card settings: ID=${safeId}, Error=${String(error.message).replace(/[\r\n]/g, "")}`);
         return res.status(400).json({ message: "Invalid card settings format" });
       }
     }
 
     if (!settings.canvasJSON) {
-      console.error(`Card settings missing canvasJSON: ID=${id}`);
+      console.error(`Card settings missing canvasJSON: ID=${safeId}`);
       return res.status(400).json({ message: "Card settings missing canvasJSON" });
     }
 
-    console.log(`Successfully fetched editable card template: ID=${id}`);
+    console.log(`Successfully fetched editable card template: ID=${safeId}`);
     return res.status(200).json(
       formatResponse({
         id: card._id,
@@ -621,7 +625,9 @@ export const editCardTemplate = async (req, res) => {
       })
     );
   } catch (error) {
-    console.error(`Edit card template error: ID=${req.params.id}, Error=${error.message}`);
+    const safeParamId = String(req.params.id || "").replace(/[\r\n]/g, "");
+    const safeErrMsg = String(error?.message || "").replace(/[\r\n]/g, "");
+    console.error(`Edit card template error: ID=${safeParamId}, Error=${safeErrMsg}`);
     return handleError(res, error, "Edit card template error");
   }
 };
