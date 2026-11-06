@@ -1,6 +1,5 @@
 import BetaHelp from "./pages/BetaHelp";
 import { BETA_MODE } from "./data/laayoune";
-("use client");
 
 import React, { lazy, Suspense } from "react";
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";

@@ -342,7 +342,7 @@ const WeddingServicesForm = () => {
   };
 
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
+    const { name, value, type } = e.target;
 
     if (name === "working_days") {
       const selectedOptions = Array.from(

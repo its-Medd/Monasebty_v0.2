@@ -3,7 +3,6 @@
 
 import { useState, useEffect } from "react"
 import { useNavigate, useLocation } from "react-router-dom"
-import { useAuth } from "../context/AuthContext"
 import { Button } from "react-bootstrap"
 import { ToastContainer } from "react-toastify"
 import "react-toastify/dist/ReactToastify.css"
@@ -12,7 +11,6 @@ import "../styles/add-service.css"
 
 
 const AddService = () => {
-  const { user } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
   const [serviceType, setServiceType] = useState(null)

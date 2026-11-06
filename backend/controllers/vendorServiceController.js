@@ -364,13 +364,6 @@ export const updateBookingStatus = async (req, res) => {
         }
         const message = `Your booking for ${itemName} has been updated to ${status}.`;
         await sendOTP(user.phone, message);
-        if (status === "confirmed") {
-          const whatsappLink = generateWhatsAppLink(
-            user.phone,
-            `Hello! Your booking for ${itemName} has been confirmed. Thank you for choosing our services.`
-          );
-          // Note: WhatsApp link can be used by frontend
-        }
       }
 
       await session.commitTransaction();

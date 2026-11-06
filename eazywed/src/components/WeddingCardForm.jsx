@@ -1,8 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useNavigate, useParams, useLocation } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "react-bootstrap";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -10,9 +9,7 @@ import "../styles/card-form.css";
 import createAPI from "../utils/api";
 
 const WeddingCardForm = () => {
-  const { user } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation();
   const { cardId } = useParams();
   const isEditMode = !!cardId;
   const [isLoading, setIsLoading] = useState(isEditMode);

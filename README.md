@@ -1,4 +1,7 @@
-# Monasebty 
+# Monasebty
+
+[![Validate project](https://github.com/GitMehdi-sys/Monasebty/actions/workflows/pr-validation.yml/badge.svg)](https://github.com/GitMehdi-sys/Monasebty/actions/workflows/pr-validation.yml)
+[![CodeQL](https://github.com/GitMehdi-sys/Monasebty/actions/workflows/codeql.yml/badge.svg)](https://github.com/GitMehdi-sys/Monasebty/actions/workflows/codeql.yml)
 
 A modern, full-stack wedding planning & vendor marketplace platform. Monasebty connects couples with wedding service providers—venues, photographers, bridal makeup artists, henna artists, bridal wear, car rentals, and customizable wedding cards.
 
@@ -122,11 +125,15 @@ npm run dev
 
 - **Backend tests:**
   ```bash
-  cd backend && npm test
+  npm --prefix backend test
+  ```
+- **Frontend tests:**
+  ```bash
+  npm --prefix eazywed test
   ```
 - **Frontend build test:**
   ```bash
-  cd eazywed && npm run build
+  npm --prefix eazywed run build
   ```
 
 ---
@@ -134,6 +141,13 @@ npm run dev
 ## 🔒 Security
 
 All database queries are sanitized against NoSQL operator injection using strict literal comparison semantics (`$eq`), input validation, and strict property whitelisting. Dependencies are regularly audited and maintained vulnerability-free.
+
+---
+
+## 👥 Contributors
+
+- **El Mehdi El Mouate** ([@GitMehdi-sys](https://github.com/GitMehdi-sys)) — Project Lead & Backend
+- **Mohamed Belmaizi** ([@its-Medd](https://github.com/its-Medd)) — Collaborator & Contributor
 
 ---
 

@@ -1,4 +1,3 @@
-import express from "express";
 import mongoose from "mongoose";
 import Service from "../models/Service.js";
 import CardTemplate from "../models/CardTemplate.js";
@@ -9,8 +8,6 @@ import ContactMessage from "../models/ContactMessage.js";
 import { getPersonalizedRecommendations, getPopularRecommendations } from "../utils/recommendationEngine.js";
 import { generateWhatsAppLink } from "../utils/whatsapp.js";
 import { sendOTP } from "../utils/twilio.js";
-
-const router = express.Router();
 
 const formatResponse = (data, pagination = null) => {
   return pagination ? { data, pagination } : { data };
