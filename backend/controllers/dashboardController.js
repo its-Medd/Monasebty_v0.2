@@ -7,7 +7,6 @@ import BlockedUsers from "../models/BlockedUsers.js";
 import { sendOTP } from "../utils/twilio.js";
 import Estimation from "../models/Estimation.js";
 import mongoose from "mongoose";
-import { generateWhatsAppLink } from "../utils/whatsapp.js"; // Import utility
 
 // Admin Dashboard Stats
 export const getAdminDashboardStats = async (req, res) => {
@@ -1000,7 +999,7 @@ export const revertCardToPending = async (req, res) => {
 export const createEstimation = async (req, res) => {
   // Create or update an estimation for services and/or cards
   const userId = req.user.id;
-  const { services = [], cards = [], date_time } = req.body;
+  const { services = [], cards = [] } = req.body;
 
   try {
     // Validate input

@@ -1,5 +1,4 @@
 // recommendationEngine.js
-import mongoose from "mongoose";
 import Service from "../models/Service.js";
 import CardTemplate from "../models/CardTemplate.js";
 import Booking from "../models/Booking.js";

@@ -18,7 +18,6 @@ import {
   getLocations,
   checkCardAvailability
 } from "../controllers/publicController.js";
-import { verifyToken, userCheck } from "../middleware/auth.js";
 
 const router = express.Router();
 

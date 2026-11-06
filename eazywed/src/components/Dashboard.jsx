@@ -29,7 +29,6 @@ const Dashboard = () => {
     reviews: { page: 1, total: 0, pages: 0 },
   });
 
-  const [selectedReview, setSelectedReview] = useState(null);
   const [showReviewModal, setShowReviewModal] = useState(false);
 
   const [reviewData, setReviewData] = useState({

@@ -1,5 +1,4 @@
 import { BETA_MODE } from "../data/laayoune";
-("use client");
 
 import { createContext, useState, useContext, useEffect } from "react";
 import axios from "axios";

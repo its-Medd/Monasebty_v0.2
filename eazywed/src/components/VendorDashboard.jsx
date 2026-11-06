@@ -132,11 +132,6 @@ const VendorDashboard = () => {
     }
   };
 
-  const handleTabClick = (tab) => {
-    setActiveTab(tab);
-    fetchDashboardData(tab);
-  };
-
   const handleChangePage = (tab, page) => {
     // Update active tab if different
     if (tab !== activeTab) {
@@ -184,10 +179,6 @@ const VendorDashboard = () => {
   };
 
   // Card actions
-  const addCard = () => {
-    navigate("/vendor/cards/add");
-  };
-
   const editCard = (cardId) => {
     navigate(`/vendor/cards/edit/${cardId}`);
   };
@@ -232,63 +223,6 @@ const VendorDashboard = () => {
       toast.error(
         error.response?.data?.message || "Failed to update booking status",
       );
-    }
-  };
-
-  const confirmBooking = async (bookingId) => {
-    try {
-      if (!selectedBooking) {
-        toast.error("Booking data not found");
-        return;
-      }
-
-      // Update booking status to confirmed
-      const updateResponse = await api.patch(
-        `/vendor/bookings/${bookingId}/status`,
-        {
-          status: "confirmed",
-        },
-      );
-
-      if (!updateResponse.data || !updateResponse.data.message) {
-        throw new Error("Unexpected response from server");
-      }
-
-      // Try to get user contact info for WhatsApp message
-      try {
-        const userResponse = await api.get(
-          `/vendor/bookings/${bookingId}/user`,
-        );
-        const userPhone = userResponse.data.phone;
-        const serviceName = selectedBooking.service_name || "your booking";
-
-        // Close modal and refresh data
-        setShowStatusModal(false);
-        fetchDashboardData("bookings");
-
-        // Generate WhatsApp message and open in new tab only if we have user phone
-        if (userPhone) {
-          const message = `Hello! Your booking for "${serviceName}" has been confirmed. Thank you for choosing our services.`;
-          const whatsappLink = generateWhatsAppLink(userPhone, message);
-          window.open(whatsappLink, "_blank");
-        } else {
-          console.warn("User phone not available for WhatsApp message");
-        }
-      } catch (userError) {
-        console.error("Error getting user information:", userError);
-        // Even if we can't get user info, the booking was still confirmed
-        toast.warning(
-          "Booking confirmed, but couldn't retrieve user contact information",
-        );
-        setShowDeleteModal(false);
-        fetchDashboardData("bookings");
-      }
-
-      // Show success message regardless of whether WhatsApp message was sent
-      toast.success("Booking confirmed successfully");
-    } catch (error) {
-      console.error("Error confirming booking:", error);
-      toast.error(error.response?.data?.message || "Failed to confirm booking");
     }
   };
 
